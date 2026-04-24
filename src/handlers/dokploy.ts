@@ -7,7 +7,6 @@ const { CAMPFIRE_DOKPLOY_ROOM_URL } = process.env;
 const DokployPayloadSchema = z.object({
   applicationName: z.string().optional(),
   applicationType: z.string().optional(),
-  buildLink: z.string().optional(),
   date: z.string().optional(),
   domains: z.string().optional(),
   message: z.string(),
@@ -30,10 +29,7 @@ export const handleDokployNotification = async (
 
   // Build app identifier from available fields
   const appName = parsed.applicationName ?? parsed.projectName;
-  const appInfo = appName ? ` <code>${appName}</code> ·` : "";
-
-  // Add build link if available
-  const buildLink = parsed.buildLink ? ` <a href="${parsed.buildLink}">Ver logs</a>` : "";
+  const appInfo = appName ? ` <strong>${appName}</strong> ·` : "";
 
   // Choose emoji based on status
   let icon = "🚀";
@@ -43,7 +39,7 @@ export const handleDokployNotification = async (
     icon = "✅";
   }
 
-  const html = `${icon} <strong>Dokploy</strong> ·${appInfo} ${parsed.title}: ${parsed.message}${buildLink}`;
+  const html = `${icon} ${appInfo}: ${parsed.message}`;
 
   await postToRoom(html, log, CAMPFIRE_DOKPLOY_ROOM_URL);
   log.info("dokploy notification handled", {
