@@ -6,11 +6,21 @@ if (!CAMPFIRE_ROOM_URL) {
   throw new Error("CAMPFIRE_ROOM_URL not configured");
 }
 
-export const postToRoom = async (html: string, log: RequestLogger): Promise<void> => {
+export const postToRoom = async (
+  html: string,
+  log: RequestLogger,
+  roomUrl?: string,
+): Promise<void> => {
+  const targetUrl = roomUrl ?? CAMPFIRE_ROOM_URL;
+
+  if (!targetUrl) {
+    throw new Error("No room URL configured");
+  }
+
   const start = Date.now();
 
   try {
-    const res = await fetch(CAMPFIRE_ROOM_URL, {
+    const res = await fetch(targetUrl, {
       body: html,
       headers: {
         "Content-Type": "text/html",
