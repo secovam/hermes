@@ -29,7 +29,7 @@ export const handleDokployNotification = async (
 
   // Build app identifier from available fields
   const appName = parsed.applicationName ?? parsed.projectName;
-  const appInfo = appName ? ` <strong>${appName}</strong> ·` : "";
+  const appInfo = appName ? ` <strong>${appName}</strong>` : "";
 
   // Choose emoji based on status
   let icon = "🚀";
