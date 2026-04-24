@@ -8,10 +8,13 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "hono": "^4.12.14"
+    "evlog": "^2.13.0",
+    "hono": "^4.12.14",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/node": "^25.6.0",
     "lefthook": "^2.1.6",
     "lint-staged": "^16.4.0",
     "oxfmt": "^0.46.0",
