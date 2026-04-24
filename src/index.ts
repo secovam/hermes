@@ -4,6 +4,7 @@ import { evlog } from "evlog/hono";
 import type { RequestLogger } from "evlog";
 import { routeEvent } from "./router.js";
 import { verifyGitHubSignature } from "./verify.js";
+import { handleDokployNotification } from "./handlers/dokploy.js";
 
 initLogger({ env: { service: "hermes" } });
 
@@ -52,6 +53,16 @@ app.post("/webhook", verifyGitHubSignature, async (c) => {
   }
 
   log.info("webhook processed");
+  return c.json({ ok: true }, 200);
+});
+
+app.post("/dokploy", async (c) => {
+  const log = c.get("log");
+  const payload = await c.req.json();
+
+  await handleDokployNotification(payload, log);
+
+  log.info("dokploy notification processed");
   return c.json({ ok: true }, 200);
 });
 
