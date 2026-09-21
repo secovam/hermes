@@ -11,16 +11,18 @@ Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notif
 
 ## Eventos soportados
 
-| Evento                   | Condición       | Mensaje                                              |
-| ------------------------ | --------------- | ---------------------------------------------------- |
-| `push`                   | Rama `main`     | 📝 **repo** · [sha7](url) mensaje — autor            |
-| `pull_request.opened`    | Todas las ramas | 🔀 **repo** · PR [#n título](url) abierto por autor  |
-| `pull_request.closed`    | Mergeado        | ✅ **repo** · PR [#n título](url) mergeado por autor |
-| `pull_request.closed`    | Sin merge       | ❌ **repo** · PR [#n título](url) cerrado sin merge  |
-| `issues.opened`          | —               | 🐛 **repo** · issue [#n título](url) por autor       |
-| `issues.closed`          | —               | ☑️ **repo** · issue [#n título](url) cerrado         |
-| `release.published`      | —               | 🚀 **repo** · release [tag](url) publicada           |
-| `workflow_run.completed` | Fallo en `main` | 💥 **repo** · workflow [nombre](url) falló en main   |
+| Evento                                | Condición         | Mensaje                                                            |
+| ------------------------------------- | ----------------- | ------------------------------------------------------------------ |
+| `push`                                | Rama `main`       | 📝 **repo** · [sha7](url) mensaje — autor                          |
+| `pull_request.opened`                 | Todas las ramas   | 🔀 **repo** · PR [#n título](url) abierto por autor                |
+| `pull_request.closed`                 | Mergeado          | ✅ **repo** · PR [#n título](url) mergeado por autor               |
+| `pull_request.closed`                 | Sin merge         | ❌ **repo** · PR [#n título](url) cerrado sin merge                |
+| `issues.opened`                       | —                 | 🐛 **repo** · issue [#n título](url) por autor                     |
+| `issues.closed`                       | —                 | ☑️ **repo** · issue [#n título](url) cerrado                       |
+| `release.published`                   | —                 | 🚀 **repo** · release [tag](url) publicada                         |
+| `workflow_run.completed`              | Fallo en `main`   | 💥 **repo** · workflow [nombre](url) falló en main                 |
+| `issue_comment.created`               | PR, bot de review | 💬 **repo** · CodeRabbit/Macroscope comentó en PR [#n título](url) |
+| `pull_request_review_comment.created` | Bot de review     | 💬 **repo** · CodeRabbit/Macroscope comentó en un archivo del PR   |
 
 ## Variables de entorno
 
@@ -61,7 +63,7 @@ bun run fix
    - Payload URL: `https://hermes.tudominio.com/webhook`
    - Content type: `application/json`
    - Secret: el mismo valor de `GITHUB_WEBHOOK_SECRET`
-   - Eventos: `push`, `pull_request`, `issues`, `release`, `workflow_run`
+   - Eventos: `push`, `pull_request`, `pull_request_review_comment`, `issue_comment`, `issues`, `release`, `workflow_run`
 
 4. **Verificar:**
    - Hacer un commit a `main` en un repo de Secovam
