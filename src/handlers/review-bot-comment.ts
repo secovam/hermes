@@ -3,6 +3,8 @@ import type { RequestLogger } from "evlog";
 import { postToRoom } from "../campfire.js";
 import { formatBotComment, reviewBotLabel } from "../review-bots.js";
 
+const { CAMPFIRE_REVIEW_ROOM_URL } = process.env;
+
 const CommentSchema = z.object({
   body: z.string(),
   html_url: z.string(),
@@ -54,6 +56,10 @@ const publishBotComment = async (
     return;
   }
 
+  if (!CAMPFIRE_REVIEW_ROOM_URL) {
+    throw new Error("CAMPFIRE_REVIEW_ROOM_URL not configured");
+  }
+
   const html = formatBotComment({
     body: input.body,
     bot,
@@ -64,7 +70,7 @@ const publishBotComment = async (
     url: input.url,
   });
 
-  await postToRoom(html, log);
+  await postToRoom(html, log, CAMPFIRE_REVIEW_ROOM_URL);
   log.info("review bot comment handled", {
     comment: { bot, number: input.number, repo: input.repo },
   });

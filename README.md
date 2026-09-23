@@ -24,11 +24,14 @@ Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notif
 | `issue_comment.created`               | PR, bot de review | 💬 **repo** · CodeRabbit/Macroscope comentó en PR [#n título](url) |
 | `pull_request_review_comment.created` | Bot de review     | 💬 **repo** · CodeRabbit/Macroscope comentó en un archivo del PR   |
 
+Los comentarios de CodeRabbit y Macroscope se publican en `CAMPFIRE_REVIEW_ROOM_URL`. El resto de eventos de GitHub sigue yendo a `CAMPFIRE_ROOM_URL`.
+
 ## Variables de entorno
 
 ```env
 GITHUB_WEBHOOK_SECRET=xxx # secreto del webhook org-level
 CAMPFIRE_ROOM_URL=https://campfire.ejemplo.com/rooms/123/bot/abc/messages
+CAMPFIRE_REVIEW_ROOM_URL=https://campfire.ejemplo.com/rooms/789/bot/ghi/messages # CodeRabbit y Macroscope
 PORT=3000
 LOG_LEVEL=info # debug, info, warn, error
 ```
