@@ -1,8 +1,7 @@
 import { z } from "zod";
 import type { RequestLogger } from "evlog";
 import { postToRoom } from "../campfire.js";
-
-const { CAMPFIRE_DOKPLOY_ROOM_URL } = process.env;
+import { env } from "../env.js";
 
 const DokployPayloadSchema = z.object({
   applicationName: z.string().optional(),
@@ -21,7 +20,7 @@ export const handleDokployNotification = async (
   payload: unknown,
   log: RequestLogger,
 ): Promise<void> => {
-  if (!CAMPFIRE_DOKPLOY_ROOM_URL) {
+  if (!env.CAMPFIRE_DOKPLOY_ROOM_URL) {
     throw new Error("CAMPFIRE_DOKPLOY_ROOM_URL not configured");
   }
 
@@ -42,7 +41,7 @@ export const handleDokployNotification = async (
 
   const html = `${icon} ${appInfo}: ${parsed.message}`;
 
-  await postToRoom(html, log, CAMPFIRE_DOKPLOY_ROOM_URL);
+  await postToRoom(html, log, env.CAMPFIRE_DOKPLOY_ROOM_URL);
   log.info("dokploy notification handled", {
     dokploy: {
       app_name: appName,

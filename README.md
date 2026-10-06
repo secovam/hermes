@@ -1,6 +1,6 @@
 # Hermes
 
-Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notificaciones en una sala de Campfire.
+Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y notificaciones de despliegue de Dokploy, y los postea en salas de Campfire.
 
 ## Stack
 
@@ -26,15 +26,28 @@ Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notif
 
 Los comentarios de CodeRabbit se publican en `CAMPFIRE_REVIEW_ROOM_URL`. El resto de eventos de GitHub sigue yendo a `CAMPFIRE_ROOM_URL`.
 
+Las notificaciones de despliegue llegan a `POST /dokploy` y se publican en `CAMPFIRE_DOKPLOY_ROOM_URL` (✅ éxito, ❌ error).
+
 ## Variables de entorno
 
+Se validan al arrancar en `src/env.ts`. Si falta una obligatoria, el proceso no inicia y el error aparece en los logs de Dokploy.
+
 ```env
-GITHUB_WEBHOOK_SECRET=xxx # secreto del webhook org-level
-CAMPFIRE_ROOM_URL=https://campfire.ejemplo.com/rooms/123/bot/abc/messages
-CAMPFIRE_REVIEW_ROOM_URL=https://campfire.ejemplo.com/rooms/789/bot/ghi/messages # CodeRabbit y Macroscope
+GITHUB_WEBHOOK_SECRET=xxx # obligatoria; secreto del webhook org-level
+CAMPFIRE_ROOM_URL=https://campfire.ejemplo.com/rooms/123/bot/abc/messages # obligatoria; actividad de GitHub
+CAMPFIRE_DOKPLOY_ROOM_URL=https://campfire.ejemplo.com/rooms/456/bot/def/messages # opcional; despliegues de Dokploy
+CAMPFIRE_REVIEW_ROOM_URL=https://campfire.ejemplo.com/rooms/789/bot/ghi/messages # opcional; comentarios de CodeRabbit
 PORT=3000
 LOG_LEVEL=info # debug, info, warn, error
 ```
+
+Si falta una sala opcional, solo fallan los avisos que dependen de ella.
+
+### Obtener la URL de una sala de Campfire
+
+1. En Campfire, crea un bot y agrégalo a la sala que recibirá los avisos ([guía de bots](https://github.com/basecamp/campfire-bot-kit)).
+2. Copia la URL de publicación del bot para esa sala. Incluye la clave del bot: trátala como una contraseña.
+3. Puedes usar la misma URL en varias variables para concentrar todos los avisos en una sala.
 
 ## Desarrollo local
 
@@ -59,7 +72,7 @@ bun run fix
    - Dockerfile: `Dockerfile`
    - Puerto: `3000`
 
-2. **Configurar variables de entorno** en Dokploy (ver sección anterior)
+2. **Configurar variables de entorno** en el servicio de Hermes → Environment (ver sección anterior) y redesplegar.
 
 3. **Crear webhook org-level en GitHub:**
    - Ir a: https://github.com/organizations/Secovam/settings/hooks
@@ -68,7 +81,11 @@ bun run fix
    - Secret: el mismo valor de `GITHUB_WEBHOOK_SECRET`
    - Eventos: `push`, `pull_request`, `pull_request_review_comment`, `issue_comment`, `issues`, `release`, `workflow_run`
 
-4. **Verificar:**
+4. **Notificaciones de Dokploy:**
+   - En Dokploy → Notifications, crea una notificación de tipo webhook.
+   - URL: `https://hermes.tudominio.com/dokploy`
+
+5. **Verificar:**
    - Hacer un commit a `main` en un repo de Secovam
    - Debería aparecer el mensaje en Campfire
 

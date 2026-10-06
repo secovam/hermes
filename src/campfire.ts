@@ -1,21 +1,12 @@
 import type { RequestLogger } from "evlog";
-
-const { CAMPFIRE_ROOM_URL } = process.env;
-
-if (!CAMPFIRE_ROOM_URL) {
-  throw new Error("CAMPFIRE_ROOM_URL not configured");
-}
+import { env } from "./env.js";
 
 export const postToRoom = async (
   html: string,
   log: RequestLogger,
   roomUrl?: string,
 ): Promise<void> => {
-  const targetUrl = roomUrl ?? CAMPFIRE_ROOM_URL;
-
-  if (!targetUrl) {
-    throw new Error("No room URL configured");
-  }
+  const targetUrl = roomUrl ?? env.CAMPFIRE_ROOM_URL;
 
   const start = Date.now();
 

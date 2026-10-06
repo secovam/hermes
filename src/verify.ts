@@ -1,12 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { MiddlewareHandler } from "hono";
 import type { EvlogVariables } from "evlog/hono";
-
-const { GITHUB_WEBHOOK_SECRET } = process.env;
-
-if (!GITHUB_WEBHOOK_SECRET) {
-  throw new Error("GITHUB_WEBHOOK_SECRET not configured");
-}
+import { env } from "./env.js";
 
 type Variables = EvlogVariables & {
   rawBody: string;
@@ -17,7 +12,7 @@ export const verifyGitHubSignature: MiddlewareHandler<{ Variables: Variables }> 
   next,
 ) => {
   // Skip verification in development
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     const rawBody = await c.req.raw.text();
     c.set("rawBody", rawBody);
     await next();
@@ -32,7 +27,7 @@ export const verifyGitHubSignature: MiddlewareHandler<{ Variables: Variables }> 
 
   const rawBody = await c.req.raw.text();
 
-  const hmac = createHmac("sha256", GITHUB_WEBHOOK_SECRET);
+  const hmac = createHmac("sha256", env.GITHUB_WEBHOOK_SECRET);
   hmac.update(rawBody);
   const expectedSignature = `sha256=${hmac.digest("hex")}`;
 

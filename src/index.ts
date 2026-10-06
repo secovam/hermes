@@ -5,6 +5,7 @@ import type { RequestLogger } from "evlog";
 import { routeEvent } from "./router.js";
 import { verifyGitHubSignature } from "./verify.js";
 import { handleDokployNotification } from "./handlers/dokploy.js";
+import { env } from "./env.js";
 
 initLogger({ env: { service: "hermes" } });
 
@@ -66,11 +67,9 @@ app.post("/dokploy", async (c) => {
   return c.json({ ok: true }, 200);
 });
 
-const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
-
-console.log(JSON.stringify({ level: "info", msg: "server starting", port: PORT }));
+console.log(JSON.stringify({ level: "info", msg: "server starting", port: env.PORT }));
 
 export default {
   fetch: app.fetch,
-  port: PORT,
+  port: env.PORT,
 };
