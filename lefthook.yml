@@ -1,13 +1,14 @@
 pre-commit:
   jobs:
-    - run: bun x ultracite fix {staged_files}
+    - name: lint-and-format-code
+      run: bun x ultracite fix {staged_files}
       glob:
-        - "**/*.js"
-        - "**/*.jsx"
-        - "**/*.ts"
-        - "**/*.tsx"
-        - "**/*.json"
-        - "**/*.jsonc"
-        - "**/*.css"
+        - "*.{js,jsx,ts,tsx,json,jsonc,css}"
+        - "**/*.{js,jsx,ts,tsx,json,jsonc,css}"
+      stage_fixed: true
+    - name: format-markdown
+      run: bun x oxfmt {staged_files}
+      glob:
+        - "*.md"
         - "**/*.md"
       stage_fixed: true
