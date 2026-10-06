@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "check": "ultracite check",
+    "check": "ultracite check && bun scripts/check-sync.ts",
     "fix": "ultracite fix",
     "prepare": "lefthook install"
   },

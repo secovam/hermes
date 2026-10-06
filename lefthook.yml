@@ -12,3 +12,10 @@ pre-commit:
         - "*.md"
         - "**/*.md"
       stage_fixed: true
+    - name: check-sync
+      run: bun scripts/check-sync.ts
+      glob:
+        - "src/env.ts"
+        - "src/router.ts"
+        - ".env.example"
+        - "README.md"

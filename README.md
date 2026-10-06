@@ -38,7 +38,7 @@ CAMPFIRE_ROOM_URL=https://campfire.ejemplo.com/rooms/123/bot/abc/messages # obli
 CAMPFIRE_DOKPLOY_ROOM_URL=https://campfire.ejemplo.com/rooms/456/bot/def/messages # opcional; despliegues de Dokploy
 CAMPFIRE_REVIEW_ROOM_URL=https://campfire.ejemplo.com/rooms/789/bot/ghi/messages # opcional; comentarios de CodeRabbit
 PORT=3000
-LOG_LEVEL=info # debug, info, warn, error
+NODE_ENV=production # opcional; `development` omite la verificación de firma (solo local). El Dockerfile ya fija `production`
 ```
 
 Si falta una sala opcional, solo fallan los avisos que dependen de ella.
@@ -100,6 +100,16 @@ ngrok http 3000
 
 # Configurar webhook en GitHub apuntando a la URL de ngrok
 ```
+
+## Solución de problemas
+
+Revisa primero la configuración desplegada en Dokploy; casi siempre la causa está ahí y no en el código.
+
+- **Dejaron de llegar todos los avisos:** falta o es inválida una variable obligatoria y el proceso no arranca. El error de Zod está en los logs de Dokploy; corrígela en Environment y redespliega.
+- **Solo faltan los avisos de despliegue o de CodeRabbit:** su sala opcional no está configurada. El handler lanza `"<VAR> not configured"` y la petición responde 500.
+- **GitHub recibe 401:** el secreto del webhook en GitHub no coincide con `GITHUB_WEBHOOK_SECRET`. Las entregas recientes están en la configuración del webhook de la organización.
+- **GitHub recibe 200 pero no se publica nada:** el evento no está en `src/router.ts` o el handler lo filtró (push fuera de `main`, `action` no soportada, comentario de un bot fuera de `REVIEW_BOTS` en `src/review-bots.ts`). Compara con "Eventos soportados".
+- **GitHub recibe 500:** busca `campfire request failed` / `campfire request error` en los logs (URL de sala incorrecta o Campfire caído) o un error de Zod (cambió la forma del payload).
 
 ## Logs
 
