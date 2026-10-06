@@ -10,7 +10,6 @@ const WHITESPACE = /\s+/g;
 
 export const REVIEW_BOTS = {
   "coderabbitai[bot]": "CodeRabbit",
-  "macroscopeapp[bot]": "Macroscope",
 } as const;
 
 type ReviewBotLogin = keyof typeof REVIEW_BOTS;

@@ -11,20 +11,20 @@ Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notif
 
 ## Eventos soportados
 
-| Evento                                | Condición         | Mensaje                                                            |
-| ------------------------------------- | ----------------- | ------------------------------------------------------------------ |
-| `push`                                | Rama `main`       | 📝 **repo** · [sha7](url) mensaje — autor                          |
-| `pull_request.opened`                 | Todas las ramas   | 🔀 **repo** · PR [#n título](url) abierto por autor                |
-| `pull_request.closed`                 | Mergeado          | ✅ **repo** · PR [#n título](url) mergeado por autor               |
-| `pull_request.closed`                 | Sin merge         | ❌ **repo** · PR [#n título](url) cerrado sin merge                |
-| `issues.opened`                       | —                 | 🐛 **repo** · issue [#n título](url) por autor                     |
-| `issues.closed`                       | —                 | ☑️ **repo** · issue [#n título](url) cerrado                       |
-| `release.published`                   | —                 | 🚀 **repo** · release [tag](url) publicada                         |
-| `workflow_run.completed`              | Fallo en `main`   | 💥 **repo** · workflow [nombre](url) falló en main                 |
-| `issue_comment.created`               | PR, bot de review | 💬 **repo** · CodeRabbit/Macroscope comentó en PR [#n título](url) |
-| `pull_request_review_comment.created` | Bot de review     | 💬 **repo** · CodeRabbit/Macroscope comentó en un archivo del PR   |
+| Evento                                | Condición       | Mensaje                                                 |
+| ------------------------------------- | --------------- | ------------------------------------------------------- |
+| `push`                                | Rama `main`     | 📝 **repo** · [sha7](url) mensaje — autor               |
+| `pull_request.opened`                 | Todas las ramas | 🔀 **repo** · PR [#n título](url) abierto por autor     |
+| `pull_request.closed`                 | Mergeado        | ✅ **repo** · PR [#n título](url) mergeado por autor    |
+| `pull_request.closed`                 | Sin merge       | ❌ **repo** · PR [#n título](url) cerrado sin merge     |
+| `issues.opened`                       | —               | 🐛 **repo** · issue [#n título](url) por autor          |
+| `issues.closed`                       | —               | ☑️ **repo** · issue [#n título](url) cerrado            |
+| `release.published`                   | —               | 🚀 **repo** · release [tag](url) publicada              |
+| `workflow_run.completed`              | Fallo en `main` | 💥 **repo** · workflow [nombre](url) falló en main      |
+| `issue_comment.created`               | PR, CodeRabbit  | 💬 **repo** · CodeRabbit comentó en PR [#n título](url) |
+| `pull_request_review_comment.created` | CodeRabbit      | 💬 **repo** · CodeRabbit comentó en un archivo del PR   |
 
-Los comentarios de CodeRabbit y Macroscope se publican en `CAMPFIRE_REVIEW_ROOM_URL`. El resto de eventos de GitHub sigue yendo a `CAMPFIRE_ROOM_URL`.
+Los comentarios de CodeRabbit se publican en `CAMPFIRE_REVIEW_ROOM_URL`. El resto de eventos de GitHub sigue yendo a `CAMPFIRE_ROOM_URL`.
 
 ## Variables de entorno
 
