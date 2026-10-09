@@ -11,18 +11,18 @@ Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notif
 
 ## Eventos soportados
 
-| Evento                                | Condición       | Mensaje                                                 |
-| ------------------------------------- | --------------- | ------------------------------------------------------- |
-| `push`                                | Rama `main`     | 📝 **repo** · [sha7](url) mensaje — autor               |
-| `pull_request.opened`                 | Todas las ramas | 🔀 **repo** · PR [#n título](url) abierto por autor     |
-| `pull_request.closed`                 | Mergeado        | ✅ **repo** · PR [#n título](url) mergeado por autor    |
-| `pull_request.closed`                 | Sin merge       | ❌ **repo** · PR [#n título](url) cerrado sin merge     |
-| `issues.opened`                       | —               | 🐛 **repo** · issue [#n título](url) por autor          |
-| `issues.closed`                       | —               | ☑️ **repo** · issue [#n título](url) cerrado            |
-| `release.published`                   | —               | 🚀 **repo** · release [tag](url) publicada              |
-| `workflow_run.completed`              | Fallo en `main` | 💥 **repo** · workflow [nombre](url) falló en main      |
-| `issue_comment.created`               | PR, CodeRabbit  | 💬 **repo** · CodeRabbit comentó en PR [#n título](url) |
-| `pull_request_review_comment.created` | CodeRabbit      | 💬 **repo** · CodeRabbit comentó en un archivo del PR   |
+| Evento                                | Condición                  | Mensaje                                                       |
+| ------------------------------------- | -------------------------- | ------------------------------------------------------------- |
+| `push`                                | Rama `main`                | 📝 **repo** · [sha7](url) mensaje — autor                     |
+| `pull_request.opened`                 | Todas las ramas            | 🔀 **repo** · PR [#n título](url) abierto por autor           |
+| `pull_request.closed`                 | Mergeado                   | ✅ **repo** · PR [#n título](url) mergeado por autor          |
+| `pull_request.closed`                 | Sin merge                  | ❌ **repo** · PR [#n título](url) cerrado sin merge           |
+| `issues.opened`                       | —                          | 🐛 **repo** · issue [#n título](url) por autor                |
+| `issues.closed`                       | —                          | ☑️ **repo** · issue [#n título](url) cerrado                  |
+| `release.published`                   | —                          | 🚀 **repo** · release [tag](url) publicada                    |
+| `workflow_run.completed`              | Fallo en `main` o en un PR | 💥 **repo** · workflow [nombre](url) falló en main o en PR #n |
+| `issue_comment.created`               | PR, CodeRabbit             | 💬 **repo** · CodeRabbit comentó en PR [#n título](url)       |
+| `pull_request_review_comment.created` | CodeRabbit                 | 💬 **repo** · CodeRabbit comentó en un archivo del PR         |
 
 Los comentarios de CodeRabbit se publican en `CAMPFIRE_REVIEW_ROOM_URL` con una vista previa breve y el enlace **Ver comentario en GitHub**, que abre el comentario exacto. Si el comentario incluye un `<summary>`, Hermes muestra ese texto; de lo contrario, usa un extracto del cuerpo.
 
@@ -31,10 +31,15 @@ Los comentarios de CodeRabbit se publican en `CAMPFIRE_REVIEW_ROOM_URL` con una 
 ```env
 GITHUB_WEBHOOK_SECRET=xxx # secreto del webhook org-level
 CAMPFIRE_ROOM_URL=https://campfire.ejemplo.com/rooms/123/bot/abc/messages
+CAMPFIRE_CI_ROOM_URL=https://campfire.ejemplo.com/rooms/456/bot/def/messages # fallos de CI en main y PR
 CAMPFIRE_REVIEW_ROOM_URL=https://campfire.ejemplo.com/rooms/789/bot/ghi/messages # CodeRabbit y Macroscope
 PORT=3000
 LOG_LEVEL=info # debug, info, warn, error
 ```
+
+Hermes envía una notificación por cada ejecución fallida de un workflow en `main` o asociada a un PR. Configura `CAMPFIRE_CI_ROOM_URL` para la sala dedicada de CI. Si falta, Hermes devuelve un error para ese webhook.
+
+Los workflows disparados por `pull_request` o `pull_request_target` también se incluyen cuando GitHub no adjunta números de PR. En ese caso, el aviso identifica la rama del PR.
 
 ## Desarrollo local
 
