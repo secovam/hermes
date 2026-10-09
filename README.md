@@ -24,7 +24,7 @@ Bot stateless que recibe webhooks del GitHub de **Grupo Secovam** y postea notif
 | `issue_comment.created`               | PR, CodeRabbit  | 💬 **repo** · CodeRabbit comentó en PR [#n título](url) |
 | `pull_request_review_comment.created` | CodeRabbit      | 💬 **repo** · CodeRabbit comentó en un archivo del PR   |
 
-Los comentarios de CodeRabbit se publican en `CAMPFIRE_REVIEW_ROOM_URL`. El resto de eventos de GitHub sigue yendo a `CAMPFIRE_ROOM_URL`.
+Los comentarios de CodeRabbit se publican en `CAMPFIRE_REVIEW_ROOM_URL` con una vista previa breve y el enlace **Ver comentario en GitHub**, que abre el comentario exacto. Si el comentario incluye un `<summary>`, Hermes muestra ese texto; de lo contrario, usa un extracto del cuerpo.
 
 ## Variables de entorno
 
