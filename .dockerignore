@@ -8,3 +8,9 @@ Dockerfile
 .vscode
 .claude
 *.md
+.audit
+data
+*.sqlite*
+*.db
+*.db-wal
+*.db-shm

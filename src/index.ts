@@ -5,6 +5,7 @@ import type { RequestLogger } from "evlog";
 import { routeEvent } from "./router.js";
 import { verifyGitHubSignature } from "./verify.js";
 import { handleDokployNotification } from "./handlers/dokploy.js";
+import { createAppSheetRouter } from "./handlers/appsheet.js";
 
 initLogger({ env: { service: "hermes" } });
 
@@ -16,6 +17,8 @@ interface Variables {
 const app = new Hono<{ Variables: Variables }>();
 
 app.use(evlog());
+
+app.route("/appsheet", createAppSheetRouter());
 
 const extractRepo = (payload: Record<string, unknown>): string | undefined => {
   const repo = payload.repository as Record<string, string> | undefined;
@@ -72,5 +75,6 @@ console.log(JSON.stringify({ level: "info", msg: "server starting", port: PORT }
 
 export default {
   fetch: app.fetch,
+  idleTimeout: 60,
   port: PORT,
 };
