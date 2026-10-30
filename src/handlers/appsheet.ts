@@ -13,6 +13,7 @@ import {
 import { postToRoom } from "../campfire.js";
 import { escapeHtml } from "../review-bots.js";
 import {
+  MAINTENANCE_LOGO,
   MAINTENANCE_SUBJECT,
   maintenanceEmailText,
   renderMaintenanceEmail,
@@ -164,6 +165,7 @@ export const createAppSheetRouter = ({
     try {
       store ??= openStore(settings.APPSHEET_DB_PATH);
       const bodyJson = JSON.stringify({
+        attachments: [MAINTENANCE_LOGO],
         from: settings.RESEND_FROM,
         html: await renderMaintenanceEmail(payload.recordId),
         subject: MAINTENANCE_SUBJECT,

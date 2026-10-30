@@ -1,10 +1,29 @@
 /* @jsxImportSource react */
 
-import { Body, Container, Font, Head, Heading, Html, Preview, Text } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Font,
+  Head,
+  Heading,
+  Html,
+  Img,
+  Preview,
+  Text,
+} from "@react-email/components";
+import { readFileSync } from "node:fs";
 import { render } from "@react-email/render";
 
 // Mirrors Kerberos' quotation email (apps/server/src/emails/quotation.tsx).
 export const MAINTENANCE_SUBJECT = "Solicitud recibida";
+
+// Inline (CID) attachment so the logo needs no public URL; see Resend's embed-inline-images docs.
+export const MAINTENANCE_LOGO = {
+  content: readFileSync(new URL("logo-grupo-secovam.png", import.meta.url)).toString("base64"),
+  content_id: "logo-grupo-secovam",
+  content_type: "image/png",
+  filename: "logo-grupo-secovam.png",
+};
 
 const TITLE = "SOLICITUD DE MANTENIMIENTO";
 const BODY = "Se ha solicitado mantenimiento de equipo, será revisado lo antes posible tu folio es";
@@ -21,6 +40,8 @@ const container = {
   maxWidth: "600px",
   padding: "30px",
 };
+
+const logo = { height: "auto", marginBottom: "24px", maxWidth: "200px" };
 
 const heading = { color: "#333333", fontSize: "24px", marginBottom: "20px" };
 
@@ -62,6 +83,13 @@ const MaintenanceRequestEmail = ({ folio }: { folio: string }) => (
     <Preview>{`${BODY} ${folio}.`}</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img
+          alt="Grupo Secovam"
+          src={`cid:${MAINTENANCE_LOGO.content_id}`}
+          style={logo}
+          width={200}
+        />
+
         <Heading as="h2" style={heading}>
           {TITLE}
         </Heading>
