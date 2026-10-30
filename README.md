@@ -66,7 +66,7 @@ bun run fix
   "appId": "appsheet-app-id",
   "table": "Solicitudes",
   "event": "record.created",
-  "recordId": "registro-estable-123",
+  "recordId": "MTTO-00042",
   "email": "persona@example.com",
   "name": "Ana"
 }
@@ -74,7 +74,7 @@ bun run fix
 
 El objeto es estricto y el límite del cuerpo es 16 KiB, incluso sin `Content-Length`. `appId`, `table` y `recordId` admiten de 1 a 200 caracteres. `email` debe ser válido y tener como máximo 254 caracteres. `name` admite hasta 200 y puede estar vacío. No se aceptan campos para asunto, remitente, HTML ni enlaces.
 
-El asunto fijo es `Recibimos tu registro`. El texto inicial es `Hola Ana,` seguido de una línea vacía y `Recibimos tu registro con ID registro-estable-123.` Sin nombre se omite el saludo. Esta plantilla requiere revisión de negocio antes de activar producción.
+El asunto fijo es `Solicitud recibida`. El correo lleva el título `SOLICITUD DE MANTENIMIENTO` y el texto `Se ha solicitado mantenimiento de equipo, será revisado lo antes posible tu folio es <recordId>.`, por lo que `recordId` debe ser el folio de la solicitud, por ejemplo `MTTO-00042`. La versión HTML sigue el estilo de los correos de Kerberos con React Email (`src/emails/maintenance-request.tsx`). `name` no aparece en el correo.
 
 ### Configuración
 

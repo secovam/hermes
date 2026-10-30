@@ -12,6 +12,11 @@ import {
 } from "../email-notifications.js";
 import { postToRoom } from "../campfire.js";
 import { escapeHtml } from "../review-bots.js";
+import {
+  MAINTENANCE_SUBJECT,
+  maintenanceEmailText,
+  renderMaintenanceEmail,
+} from "../emails/maintenance-request.js";
 import { sendResendEmail } from "../resend.js";
 
 const Identifier = z.string().min(1).max(200);
@@ -32,7 +37,6 @@ const Config = z.object({
   RESEND_API_KEY: z.string().min(1),
   RESEND_FROM: z.string().trim().min(1),
 });
-const SUBJECT = "Recibimos tu registro";
 const BODY_LIMIT = 16 * 1024;
 const tokenHash = (value: string) => createHash("sha256").update(value).digest();
 
@@ -130,7 +134,7 @@ export const createAppSheetRouter = ({
   openStore?: (path: string) => EmailNotificationStore;
   now?: () => number;
 } = {}) => {
-  const app = new Hono<{ Variables: EvlogVariables }>();
+  const app = new Hono<EvlogVariables>();
   let store: EmailNotificationStore | undefined;
 
   app.post("/", async (c) => {
@@ -161,8 +165,9 @@ export const createAppSheetRouter = ({
       store ??= openStore(settings.APPSHEET_DB_PATH);
       const bodyJson = JSON.stringify({
         from: settings.RESEND_FROM,
-        subject: SUBJECT,
-        text: `${payload.name ? `Hola ${payload.name},\n\n` : ""}Recibimos tu registro con ID ${payload.recordId}.`,
+        html: await renderMaintenanceEmail(payload.recordId),
+        subject: MAINTENANCE_SUBJECT,
+        text: maintenanceEmailText(payload.recordId),
         to: [payload.email],
       });
       let row = store.create({ ...identity, bodyJson, now: now() });
