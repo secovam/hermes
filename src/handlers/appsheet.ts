@@ -159,16 +159,28 @@ export const createAppSheetRouter = ({
     }
 
     const input = await readJson(c.req.raw);
+    const log = c.get("log");
     const parsed = Payload.safeParse(input);
     if (!parsed.success) {
+      // Field names and codes only: values can carry personal data such as the requester's email.
+      const issues = parsed.error.issues.map((issue) => ({
+        code: issue.code,
+        path: issue.path.join("."),
+        ...(issue.code === "unrecognized_keys" && { keys: issue.keys }),
+      }));
+      log.set({ appsheet: { error: "invalid_payload", issues } });
       return c.json({ error: "invalid_payload" }, 400);
     }
     const payload = parsed.data;
-    if (payload.appId !== settings.APPSHEET_APP_ID || payload.table !== settings.APPSHEET_TABLE) {
+    const mismatched = [
+      payload.appId !== settings.APPSHEET_APP_ID && "appId",
+      payload.table !== settings.APPSHEET_TABLE && "table",
+    ].filter(Boolean);
+    if (mismatched.length > 0) {
+      log.set({ appsheet: { error: "forbidden_source", mismatched } });
       return c.json({ error: "forbidden_source" }, 403);
     }
 
-    const log = c.get("log");
     const identity = notificationIdentity(payload);
     log.set({ appsheet: { key: identity.key } });
     try {
