@@ -72,9 +72,21 @@ bun run fix
 }
 ```
 
-El objeto es estricto y el límite del cuerpo es 16 KiB, incluso sin `Content-Length`. `appId`, `table` y `recordId` admiten de 1 a 200 caracteres. `email` debe ser válido y tener como máximo 254 caracteres. `name` admite hasta 200 y puede estar vacío. No se aceptan campos para asunto, remitente, HTML ni enlaces.
+El objeto es estricto y el límite del cuerpo es 16 KiB, incluso sin `Content-Length`. `appId`, `table` y `recordId` admiten de 1 a 200 caracteres. `email` debe ser válido y tener como máximo 254 caracteres. `name` admite hasta 200 y puede estar vacío. No se aceptan campos para asunto, remitente ni HTML.
 
-El asunto fijo es `Solicitud recibida`. El correo lleva el título `SOLICITUD DE MANTENIMIENTO` y el texto `Se ha solicitado mantenimiento de equipo, será revisado lo antes posible tu folio es <recordId>.`, por lo que `recordId` debe ser el folio de la solicitud, por ejemplo `MTTO-00042`. La versión HTML incrusta el logo de Grupo Secovam como adjunto inline (`cid:`), sigue el estilo de los correos de Kerberos con React Email (`src/emails/maintenance-request.tsx`). `name` no aparece en el correo.
+`event` decide el correo. Todos usan el folio como `recordId`, así que los bots de `MANTENIMIENTOS` también envían el folio de la solicitud y `table` igual a `APPSHEET_TABLE`.
+
+| `event`                | Asunto                              | Campo extra                    |
+| ---------------------- | ----------------------------------- | ------------------------------ |
+| `record.created`       | `Solicitud recibida`                | ninguno                        |
+| `maintenance.started`  | `Mantenimiento iniciado`            | ninguno                        |
+| `maintenance.finished` | `Mantenimiento terminado - <folio>` | ninguno                        |
+| `approval.confirmed`   | `Visto bueno confirmado`            | `reportUrl`, HTTPS, hasta 2000 |
+| `approval.rejected`    | `Visto bueno rechazado - <folio>`   | `reason`, no vacío, hasta 2000 |
+
+Cada evento se envía una sola vez por folio. Una solicitud reabierta no repite un correo ya aceptado para el mismo evento.
+
+Los textos de cada correo están en `src/emails/maintenance-request.tsx`. `recordId` debe ser el folio de la solicitud, por ejemplo `MTTO-00042`. La versión HTML incrusta el logo de Grupo Secovam como adjunto inline (`cid:`), sigue el estilo de los correos de Kerberos con React Email (`src/emails/maintenance-request.tsx`). `name` no aparece en el correo.
 
 ### Configuración
 
@@ -108,7 +120,7 @@ Estos pasos son posteriores a la implementación local y requieren autorización
 
 ### Deduplicación y respuestas
 
-La identidad es el SHA-256 completo de `JSON.stringify([appId, table, event, recordId])`. La clave del proveedor es `appsheet/<hash>`. Un segundo SHA-256 de `JSON.stringify([email, name])` detecta cambios de datos para esa identidad. Un nuevo `recordId` produce un nuevo correo y aviso.
+La identidad es el SHA-256 completo de `JSON.stringify([appId, table, event, recordId])`. La clave del proveedor es `appsheet/<hash>`. Un segundo SHA-256 de `JSON.stringify([email, name])`, más `reason` o `reportUrl` cuando existen, detecta cambios de datos para esa identidad. Un nuevo `recordId` produce un nuevo correo y aviso.
 
 Antes de enviar, SQLite conserva el JSON exacto de Resend. Todo reintento reutiliza esos bytes, aunque cambien remitente o plantilla. Un lease de 60 segundos reserva el correo a un propietario. Los reintentos inciertos solo se permiten antes de 23 horas desde el primer intento, que nunca se reinicia. Resend documenta una ventana de idempotencia de 24 horas. El margen depende de un reloj correcto. Véase [idempotencia en Resend](https://resend.com/docs/dashboard/emails/idempotency-keys).
 

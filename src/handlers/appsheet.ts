@@ -12,23 +12,32 @@ import {
 } from "../email-notifications.js";
 import { postToRoom } from "../campfire.js";
 import { escapeHtml } from "../review-bots.js";
-import {
-  MAINTENANCE_LOGO,
-  MAINTENANCE_SUBJECT,
-  maintenanceEmailText,
-  renderMaintenanceEmail,
-} from "../emails/maintenance-request.js";
+import { MAINTENANCE_LOGO, renderMaintenanceEmail } from "../emails/maintenance-request.js";
 import { sendResendEmail } from "../resend.js";
 
 const Identifier = z.string().min(1).max(200);
-const Payload = z.strictObject({
+const Base = {
   appId: Identifier,
   email: z.email().max(254),
-  event: z.literal("record.created"),
   name: z.string().max(200),
   recordId: Identifier,
   table: Identifier,
-});
+};
+const Payload = z.discriminatedUnion("event", [
+  z.strictObject({ ...Base, event: z.literal("record.created") }),
+  z.strictObject({ ...Base, event: z.literal("maintenance.started") }),
+  z.strictObject({ ...Base, event: z.literal("maintenance.finished") }),
+  z.strictObject({
+    ...Base,
+    event: z.literal("approval.confirmed"),
+    reportUrl: z.url({ protocol: /^https$/ }).max(2000),
+  }),
+  z.strictObject({
+    ...Base,
+    event: z.literal("approval.rejected"),
+    reason: z.string().trim().min(1).max(2000),
+  }),
+]);
 const Config = z.object({
   APPSHEET_APP_ID: Identifier,
   APPSHEET_DB_PATH: z.string().refine(isAbsolute),
@@ -164,12 +173,13 @@ export const createAppSheetRouter = ({
     log.set({ appsheet: { key: identity.key } });
     try {
       store ??= openStore(settings.APPSHEET_DB_PATH);
+      const { html, subject, text } = await renderMaintenanceEmail(payload);
       const bodyJson = JSON.stringify({
         attachments: [MAINTENANCE_LOGO],
         from: settings.RESEND_FROM,
-        html: await renderMaintenanceEmail(payload.recordId),
-        subject: MAINTENANCE_SUBJECT,
-        text: maintenanceEmailText(payload.recordId),
+        html,
+        subject,
+        text,
         to: [payload.email],
       });
       let row = store.create({ ...identity, bodyJson, now: now() });

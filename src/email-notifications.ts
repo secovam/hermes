@@ -28,12 +28,18 @@ export const notificationIdentity = (input: {
   recordId: string;
   email: string;
   name: string;
+  reason?: string;
+  reportUrl?: string;
 }) => {
   const hash = (values: string[]) =>
     createHash("sha256").update(JSON.stringify(values)).digest("hex");
+  // record.created keeps the two-field hash so retries of rows already in the ledger still match.
+  const detail = input.reason ?? input.reportUrl;
   return {
     key: hash([input.appId, input.table, input.event, input.recordId]),
-    payloadHash: hash([input.email, input.name]),
+    payloadHash: hash(
+      detail === undefined ? [input.email, input.name] : [input.email, input.name, detail],
+    ),
   };
 };
 
