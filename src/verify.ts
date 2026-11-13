@@ -8,7 +8,7 @@ if (!GITHUB_WEBHOOK_SECRET) {
   throw new Error("GITHUB_WEBHOOK_SECRET not configured");
 }
 
-type Variables = EvlogVariables & {
+type Variables = EvlogVariables["Variables"] & {
   rawBody: string;
 };
 

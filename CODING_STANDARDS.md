@@ -30,7 +30,9 @@ Use the request's evlog logger for event context and delivery results. Never log
 
 Await Campfire sends and propagate delivery failures so failed sends cannot produce successful processing results.
 
-Before adding retries, evaluate duplicate notifications and request duration. Hermes has no persistent queue or delivery deduplication; reliable delivery is a goal. Claim exactly-once delivery only when an implemented mechanism supports it.
+Before adding retries, evaluate duplicate notifications and request duration. Hermes has no persistent queue. GitHub and Dokploy have no delivery deduplication. Claim exactly-once delivery only when an implemented mechanism supports it.
+
+AppSheet is the exception to stateless delivery. Its SQLite ledger records email acceptance and the Campfire reservation separately. Persist the Resend request before sending. Use its stable idempotency key and stored bytes only within 23 hours of the original attempt, with a 60-second owner lease and a 20-second network timeout. An accepted email never returns to pending. An uncertain Campfire reservation requires manual reconciliation, regardless of age. A successful AppSheet response requires both accepted email and posted notice. The ledger prevents blind retries, not exactly-once delivery. GitHub and Dokploy have no delivery ledger.
 
 ## Verification
 
@@ -59,6 +61,10 @@ Exercise the Hono request path with valid signatures, missing signatures, and in
 ### Bug fixes
 
 Reproduce the reported failure before changing the implementation when possible. Verify the corrected behavior and a relevant neighboring case.
+
+### AppSheet persistence
+
+AppSheet tests use temporary SQLite files and simulated Resend and Campfire responses. Cover concurrent claims, reopen/restart, the 23-hour boundary, and crashes between effects and commits. Assert that missing dedicated configuration or storage failures cannot send an email. Provider mocks count requests separately from simulated acceptances. Never use production room URLs or email credentials in tests.
 
 ### Documentation and configuration
 

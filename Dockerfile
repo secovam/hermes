@@ -9,7 +9,8 @@ FROM oven/bun:1.3-alpine AS release
 
 # Crear usuario no-root para ejecutar la aplicación
 RUN addgroup --gid 65532 hermes && \
-    adduser --uid 65532 --ingroup hermes --disabled-password --gecos "" hermes
+    adduser --uid 65532 --ingroup hermes --disabled-password --gecos "" hermes && \
+    mkdir -p /data && chown hermes:hermes /data && chmod 700 /data
 
 WORKDIR /app
 ENV NODE_ENV=production

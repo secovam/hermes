@@ -10,6 +10,7 @@ export const postToRoom = async (
   html: string,
   log: RequestLogger,
   roomUrl?: string,
+  signal?: AbortSignal,
 ): Promise<void> => {
   const targetUrl = roomUrl ?? CAMPFIRE_ROOM_URL;
 
@@ -26,6 +27,8 @@ export const postToRoom = async (
         "Content-Type": "text/html",
       },
       method: "POST",
+      signal,
+      ...(signal ? { redirect: "error" as const } : {}),
     });
 
     const duration = Date.now() - start;
@@ -45,7 +48,7 @@ export const postToRoom = async (
     log.error("campfire request error", {
       campfire: {
         duration_ms: duration,
-        error: (error as Error).message,
+        error: error instanceof Error ? error.name : "UnknownError",
       },
     });
     throw error;
